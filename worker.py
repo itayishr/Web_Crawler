@@ -1,38 +1,43 @@
+import elasticsearch
 from celery import Celery
-import os
 import requests
 from elasticsearch import Elasticsearch
+
 import redis
-from common import enums
+from common import enums, config
+
 
 celery = Celery()
-celery.conf.broker_url = os.environ.get("CELERY_BROKER_URL", "amqp://guest:guest@localhost:5674/")
-ELASTIC_HOST: str = os.environ.get("ELASTICSEARCH_HOSTS", "http://localhost:9200")
-es = Elasticsearch(ELASTIC_HOST)
-REDIS_PORT: int = os.environ.get("REDIS_PORT", "6780")
-redis_client = redis.Redis(host='redis', port=REDIS_PORT)
+celery.conf.broker_url = config.CELERY_BROKER_URL
+es = Elasticsearch(config.ELASTIC_HOST)
+redis_client = redis.Redis(host='redis', port=config.REDIS_PORT)
 
 
 @celery.task(name='process_crawl_request_task')
 def process_crawl_request_task(hash, page_url, timestamp):
-    # Get raw HTML content
     # Store in Redis in the following format : {hash, status}
     redis_client.set(hash, enums.ResponseStatus.ACCEPTED.name)
-    html_content = requests.get(page_url).text
-    save_html_to_db.delay(hash, page_url, timestamp, html_content)
+    save_html_to_db_task.delay(hash, page_url, timestamp)
     print('Saving to redis')
 
 
-@celery.task(name='get_task_status')
-def get_task_status(hash):
-    return redis_client.get(hash)
-
-
-@celery.task(name='save_html_to_db')
-def save_html_to_db(hash: str, page_url: str, timestamp: str, html_content: str):
+@celery.task(name='save_html_to_db_task')
+def save_html_to_db_task(hash: str, page_url: str, timestamp: str):
     redis_client.set(hash, enums.ResponseStatus.RUNNING.name)
+    # Get HTML Content from url
+    html_content = requests.get(page_url).text
+    # Handle the html content before saving to db.
     html_json = {'url': str(page_url), 'hash': hash, 'timestamp': timestamp, 'page_content': html_content}
-    # Send raw HTML content to another queue for elasticsearch db.
-    print("Indexing")
-    resp = es.index(index='html', document=html_json)
-    redis_client.set(hash, enums.ResponseStatus.COMPLETE.name)
+    try:
+        response = es.index(index='html', document=html_json)
+        if response['result'] == 'created':
+            # Successful indexing
+            print('Document indexed successfully.')
+            redis_client.set(hash, enums.ResponseStatus.COMPLETE.name)
+        else:
+            # Error occurred during indexing
+            print('Error indexing document:', response)
+    except elasticsearch.BadRequestError as e:
+        # Exception occurred during indexing
+        print('Exception occurred during indexing:', str(e))
+        redis_client.set(hash, enums.ResponseStatus.ERROR.name)
