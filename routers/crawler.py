@@ -2,9 +2,14 @@ from starlette.responses import JSONResponse
 from fastapi import APIRouter
 import hashlib
 import time
+from worker import process_crawl_request_task, get_task_status
+from common import enums
+import os
+import redis
 
 router = APIRouter(prefix='/crawler', tags=['Web Crawler'], responses={404: {"description": "Not found"}})
-
+REDIS_PORT: int = os.environ.get("REDIS_PORT", "6780")
+redis_client = redis.Redis(host='redis', port=REDIS_PORT)
 
 def hash_timestamp_and_url(page_url: str, timestamp: str):
     appended = page_url + timestamp
@@ -21,14 +26,14 @@ async def process_crawl_request(page_url: str) -> JSONResponse:
     # TODO add processing logic
     timestamp = str(round(time.time() * 1000))
     hash = hash_timestamp_and_url(page_url, timestamp)
-    # process_crawl_request_task.delay(hash=hash,page_url=page_url,timestamp=timestamp)
+    process_crawl_request_task.delay(hash=hash,page_url=page_url,timestamp=timestamp)
     return JSONResponse({"crawl_id": hash})
 
-#
-# @router.get("/crawl_status/{crawl_id}", response_model=schemas.Status)
-# async def get_crawl_status(crawl_id: str):
-#     """
-#     Return the status of the submitted Task
-#     """
-#     tasks.get_crawl_id_status.apply_async(args=crawl_id)
-#     return JSONResponse({"Status": schemas.ResponseStatus.ACCEPTED}, status_code=200)
+
+@router.get("/crawl_status/{crawl_id}", response_model=enums.ResponseStatus)
+async def get_crawl_status(crawl_id: str):
+    """
+    Return the status of the submitted Task
+    """
+    status = redis_client.get(crawl_id).decode()
+    return JSONResponse({"Status": enums.ResponseStatus(status).name}, status_code=200)

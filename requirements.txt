@@ -1,2 +1,6 @@
 celery
-FastAPI
+fastapi
+uvicorn
+requests
+elasticsearch
+redis

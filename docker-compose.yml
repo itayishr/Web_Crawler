@@ -1,7 +1,21 @@
 version: '3.8'
 
 services:
-   rabbitmq:
+  rest_api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rest_api_server
+    # this volume is used to map the files and folders on the host to the container
+    # so if we change code on the host, code in the docker container will also be changed
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    ports:
+      - 8010:80
+
+  rabbitmq:
     image: rabbitmq:management
     hostname: rabbitmq
     ports:
@@ -14,6 +28,39 @@ services:
         RABBITMQ_DEFAULT_PASS: guest
     volumes:
       - ./conf/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    environment:
+      - xpack.security.enabled=false
+      - discovery.type=single-node
+    env_file:
+      - .env
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: always
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+
+  redis:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6780:6780'
+    command: redis-server --save 20 1 --loglevel warning --port 6780
+    volumes:
+      - redis:/data
+      - ./conf/redis.conf:/usr/local/etc/redis/redis.conf
+volumes:
+  elasticsearch-data:
+    driver: local
+  redis:
+    driver: local
 
 networks:
   default:
