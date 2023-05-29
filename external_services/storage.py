@@ -4,7 +4,8 @@ from moto import mock_s3
 from common import config
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class StorageWrapper:

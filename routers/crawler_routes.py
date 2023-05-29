@@ -13,7 +13,8 @@ from worker import process_crawl_request_task
 
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+FORMAT = "[%(filename)s:%(lineno)s - %(funcName)20s() ] %(message)s"
+logging.basicConfig(format=FORMAT, level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix='/crawler', tags=['Web Crawler'])
