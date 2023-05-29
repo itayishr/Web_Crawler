@@ -1,6 +1,8 @@
 from enum import Enum
 
-class ResponseStatus(str,Enum):
+
+# A Response Status enum for task status endpoint.
+class ResponseStatus(str, Enum):
     ACCEPTED = 'ACCEPTED'
     RUNNING = 'RUNNING'
     ERROR = 'ERROR'
