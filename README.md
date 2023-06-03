@@ -8,7 +8,7 @@ This project implements a web crawler API with two endpoints using FastAPI, Rabb
 - RabbitMQ: A message broker that enables communication between the API and the Celery worker.
 - Celery: A distributed task queue system for asynchronous processing.
 - Elasticsearch: A search engine used for storing HTML content.
-- Redis: A key-value store used for storing crawl request status.
+- Redis: A key-value caching mechanism used for storing crawl request status for fast responses.
 - S3 (Mocked with Moto): A storage service used for storing HTML files (mocked using Moto).
 
 ## Installation 
