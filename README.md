@@ -2,6 +2,8 @@
 
 This project implements a web crawler API with two endpoints using FastAPI, RabbitMQ, and Celery. The API allows users to submit a crawl request, which returns a unique crawl ID, and check the status of a crawl request using the crawl ID.
 
+Please refer to https://itayishr.atlassian.net/l/cp/UVn02psk for further explanation about my thought process. 
+
 ## Technologies Used
 
 - FastAPI: A modern, fast (high-performance) web framework for building APIs with Python.
