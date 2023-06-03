@@ -14,7 +14,7 @@ Please refer to my [Confluence page](https://itayishr.atlassian.net/l/cp/UVn02ps
 - S3 (Mocked with Moto): A storage service used for storing HTML files (mocked using Moto).
 
 ## Design 
-![Crawler_Task_Design drawio(1)](https://github.com/itayishr/Web_Crawler/assets/37871040/411bc182-5ba5-43b6-9ccd-37b810b3f336)
+![Crawler_Task_Design drawio(2)](https://github.com/itayishr/Web_Crawler/assets/37871040/2c97d4e9-eedf-41bc-be3e-3e2c4b18042c)
 
 ## Installation 
 
