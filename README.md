@@ -12,7 +12,7 @@ This project implements a web crawler API with two endpoints using FastAPI, Rabb
 - S3 (Mocked with Moto): A storage service used for storing HTML files (mocked using Moto).
 
 ## Design 
-![Crawler_Task_Design drawio](https://github.com/itayishr/Web_Crawler/assets/37871040/f99f0a9c-4b66-4a62-a500-aa8178ff54ac)
+![Crawler_Task_Design drawio(1)](https://github.com/itayishr/Web_Crawler/assets/37871040/411bc182-5ba5-43b6-9ccd-37b810b3f336)
 
 ## Installation 
 
