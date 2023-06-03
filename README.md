@@ -11,6 +11,9 @@ This project implements a web crawler API with two endpoints using FastAPI, Rabb
 - Redis: A key-value caching mechanism used for storing crawl request status for fast responses.
 - S3 (Mocked with Moto): A storage service used for storing HTML files (mocked using Moto).
 
+## Design 
+![Crawler_Task_Design drawio](https://github.com/itayishr/Web_Crawler/assets/37871040/f99f0a9c-4b66-4a62-a500-aa8178ff54ac)
+
 ## Installation 
 
 1. Clone the repository:
